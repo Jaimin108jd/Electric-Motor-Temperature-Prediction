@@ -102,22 +102,4 @@ motor-temp-prediction/
 ├── requirements.txt       # Dependencies
 └── README.md             # Documentation
 ```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-MIT License - see LICENSE file for details.
-
-## Support
-
-For questions or issues, please open a GitHub issue or contact the development team.
-
----
-**⚡ Powered by Machine Learning | Built for Industrial Applications**
+MAIL:jaimin108jd@gmail.com
