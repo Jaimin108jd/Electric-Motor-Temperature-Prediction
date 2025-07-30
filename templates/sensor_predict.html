@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data - Motor Temperature Prediction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 60px 0; }
+        .form-card { border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .input-group-text { background: #f8f9fa; border: none; }
+        .form-control { border: 2px solid #e9ecef; border-radius: 8px; }
+        .form-control:focus { border-color: #667eea; box-shadow: 0 0 0 0.2rem rgba(102,126,234,0.25); }
+        .sensor-status { border-radius: 50px; padding: 5px 15px; font-size: 0.8rem; }
+        .sensor-connected { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .sensor-disconnected { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .real-time-indicator { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .sensor-card { background: linear-gradient(45deg, #667eea, #764ba2); color: white; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-microchip"></i> Motor Temp Predictor</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+                <a class="nav-link" href="/manual"><i class="fas fa-keyboard"></i> Manual Input</a>
+                <a class="nav-link active" href="/sensor"><i class="fas fa-sensor"></i> Sensor Data</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="form-section">
+        <div class="container text-center">
+            <h1><i class="fas fa-satellite-dish"></i> Sensor Data Input</h1>
+            <p class="lead">Real-time motor parameter monitoring and temperature prediction</p>
+            <div class="mt-3">
+                <span class="sensor-status sensor-connected">
+                    <i class="fas fa-circle real-time-indicator"></i> Sensors Connected
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sensor Status Dashboard -->
+    <section class="py-4 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card sensor-card">
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3">
+                                    <i class="fas fa-bolt fa-2x mb-2"></i>
+                                    <h6>Electrical Sensors</h6>
+                                    <small>Voltage & Current</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <i class="fas fa-tachometer-alt fa-2x mb-2"></i>
+                                    <h6>Speed Sensor</h6>
+                                    <small>Motor RPM</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <i class="fas fa-thermometer-half fa-2x mb-2"></i>
+                                    <h6>Temperature Sensors</h6>
+                                    <small>Coolant & Ambient</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <i class="fas fa-wifi fa-2x mb-2"></i>
+                                    <h6>Communication</h6>
+                                    <small>Real-time Data</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Form -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card form-card">
+                        <div class="card-header bg-success text-white">
+                            <h4 class="mb-0"><i class="fas fa-satellite-dish"></i> Live Sensor Data Input</h4>
+                            <small class="d-block mt-1">
+                                <i class="fas fa-info-circle"></i> 
+                                Data can be automatically populated from connected sensors or manually adjusted
+                            </small>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-lightbulb"></i>
+                                <strong>Sensor Mode:</strong> Values below are updated from real-time sensor data. You can modify them manually if needed for testing or calibration purposes.
+                            </div>
+
+                            <form action="/predict" method="post" id="sensorPredictionForm">
+                                <div class="row">
+
+                                    <!-- Electrical Parameters -->
+                                    <div class="col-md-6">
+                                        <h5 class="text-primary mb-3"><i class="fas fa-bolt"></i> Electrical Sensors</h5>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Voltage Q-Component (V) 
+                                                <span class="sensor-status sensor-connected ms-2">
+                                                    <i class="fas fa-circle real-time-indicator"></i> Live
+                                                </span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-wave-square"></i></span>
+                                                <input type="number" class="form-control" name="u_q" step="0.1" min="-30" max="140" value="50" required>
+                                                <button type="button" class="btn btn-outline-secondary" onclick="refreshSensorData('u_q')">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </button>
+                                            </div>
+                                            <small class="text-muted">Range: -30V to 140V | Auto-updated every 5 seconds</small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Voltage D-Component (V)
+                                                <span class="sensor-status sensor-connected ms-2">
+                                                    <i class="fas fa-circle real-time-indicator"></i> Live
+                                                </span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-wave-square"></i></span>
+                                                <input type="number" class="form-control" name="u_d" step="0.1" min="-140" max="140" value="-10" required>
+                                                <button type="button" class="btn btn-outline-secondary" onclick="refreshSensorData('u_d')">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </button>
+                                            </div>
+                                            <small class="text-muted">Range: -140V to 140V | Auto-updated every 5 seconds</small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Current D-Component (A)
+                                                <span class="sensor-status sensor-connected ms-2">
+                                                    <i class="fas fa-circle real-time-indicator"></i> Live
+                                                </span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-flash"></i></span>
+                                                <input type="number" class="form-control" name="i_d" step="0.1" min="-280" max="0" value="-150" required>
+                                                <button type="button" class="btn btn-outline-secondary" onclick="refreshSensorData('i_d')">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </button>
+                                            </div>
+                                            <small class="text-muted">Range: -280A to 0A | Auto-updated every 5 seconds</small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Current Q-Component (A)
+                                                <span class="sensor-status sensor-connected ms-2">
+                                                    <i class="fas fa-circle real-time-indicator"></i> Live
+                                                </span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-flash"></i></span>
+                                                <input type="number" class="form-control" name="i_q" step="0.1" min="-300" max="310" value="25" required>
+                                                <button type="button" class="btn btn-outline-secondary" onclick="refreshSensorData('i_q')">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </button>
+                                            </div>
+                                            <small class="text-muted">Range: -300A to 310A | Auto-updated every 5 seconds</small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Mechanical & Thermal Parameters -->
+                                    <div class="col-md-6">
+                                        <h5 class="text-success mb-3"><i class="fas fa-thermometer-half"></i> Mechanical & Thermal Sensors</h5>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Motor Speed (RPM)
+                                                <span class="sensor-status sensor-connected ms-2">
+                                                    <i class="fas fa-circle real-time-indicator"></i> Live
+                                                </span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-tachometer-alt"></i></span>
+                                                <input type="number" class="form-control" name="motor_speed" step="1" min="-300" max="6000" value="2000" required>
+                                                <button type="button" class="btn btn-outline-secondary" onclick="refreshSensorData('motor_speed')">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </button>
+                                            </div>
+                                            <small class="text-muted">Range: -300 to 6000 RPM | Auto-updated every 2 seconds</small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Coolant Temperature (°C)
+                                                <span class="sensor-status sensor-connected ms-2">
+                                                    <i class="fas fa-circle real-time-indicator"></i> Live
+                                                </span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-temperature-low"></i></span>
+                                                <input type="number" class="form-control" name="coolant" step="0.1" min="10" max="105" value="45" required>
+                                                <button type="button" class="btn btn-outline-secondary" onclick="refreshSensorData('coolant')">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </button>
+                                            </div>
+                                            <small class="text-muted">Range: 10°C to 105°C | Auto-updated every 10 seconds</small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">
+                                                Ambient Temperature (°C)
+                                                <span class="sensor-status sensor-connected ms-2">
+                                                    <i class="fas fa-circle real-time-indicator"></i> Live
+                                                </span>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-thermometer-quarter"></i></span>
+                                                <input type="number" class="form-control" name="ambient" step="0.1" min="8" max="32" value="22" required>
+                                                <button type="button" class="btn btn-outline-secondary" onclick="refreshSensorData('ambient')">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </button>
+                                            </div>
+                                            <small class="text-muted">Range: 8°C to 32°C | Auto-updated every 30 seconds</small>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <hr>
+
+                                <!-- Control Buttons -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="d-grid gap-2">
+                                            <button type="button" class="btn btn-info" onclick="refreshAllSensors()">
+                                                <i class="fas fa-sync-alt"></i> Refresh All Sensors
+                                            </button>
+                                            <button type="button" class="btn btn-warning" onclick="pauseAutoUpdate()">
+                                                <i class="fas fa-pause"></i> Pause Auto-Update
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-grid gap-2">
+                                            <button type="submit" class="btn btn-success btn-lg">
+                                                <i class="fas fa-calculator"></i> Predict Temperature
+                                            </button>
+                                            <small class="text-muted text-center mt-2">
+                                                <i class="fas fa-clock"></i> Last updated: <span id="lastUpdate">Now</span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Sensor Information -->
+                    <div class="card mt-4">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0"><i class="fas fa-satellite-dish"></i> Sensor Network Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-network-wired text-primary"></i> Connected Sensors</h6>
+                                    <ul class="small">
+                                        <li><strong>Voltage Transducers:</strong> dq-frame measurements</li>
+                                        <li><strong>Current Sensors:</strong> Hall effect current clamps</li>
+                                        <li><strong>Speed Encoder:</strong> Optical rotary encoder</li>
+                                        <li><strong>Temperature Probes:</strong> PT100 RTD sensors</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-cogs text-success"></i> System Features</h6>
+                                    <ul class="small">
+                                        <li><strong>Auto-Update:</strong> Real-time data streaming</li>
+                                        <li><strong>Manual Override:</strong> Editable sensor values</li>
+                                        <li><strong>Data Logging:</strong> Historical trend analysis</li>
+                                        <li><strong>Calibration:</strong> Sensor accuracy verification</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="alert alert-warning mt-3">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Note:</strong> This is a demonstration interface. In a production environment, sensor data would be automatically populated from actual hardware sensors connected via industrial protocols (Modbus, CAN, etc.).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p>&copy; 2025 Electric Motor Temperature Prediction System. Powered by Machine Learning.</p>
+            <p><small>Sensor Integration | Real-time Monitoring | Industrial IoT Compatible</small></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simulated sensor data refresh functions
+        function refreshSensorData(parameter) {
+            // In a real implementation, this would fetch data from actual sensors
+            const input = document.querySelector(`input[name="${parameter}"]`);
+            if (input) {
+                // Simulate small variations around current value
+                const currentValue = parseFloat(input.value);
+                const variation = (Math.random() - 0.5) * 0.1 * currentValue;
+                const newValue = Math.max(input.min, Math.min(input.max, currentValue + variation));
+                input.value = newValue.toFixed(1);
+                
+                // Visual feedback
+                input.style.backgroundColor = '#e8f5e8';
+                setTimeout(() => { input.style.backgroundColor = ''; }, 1000);
+            }
+            updateLastRefreshTime();
+        }
+
+        function refreshAllSensors() {
+            const parameters = ['u_q', 'u_d', 'i_d', 'i_q', 'motor_speed', 'coolant', 'ambient'];
+            parameters.forEach(param => refreshSensorData(param));
+        }
+
+        function updateLastRefreshTime() {
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+        }
+
+        let autoUpdateEnabled = true;
+        function pauseAutoUpdate() {
+            autoUpdateEnabled = !autoUpdateEnabled;
+            const button = event.target;
+            if (autoUpdateEnabled) {
+                button.innerHTML = '<i class="fas fa-pause"></i> Pause Auto-Update';
+                button.className = 'btn btn-warning';
+            } else {
+                button.innerHTML = '<i class="fas fa-play"></i> Resume Auto-Update';
+                button.className = 'btn btn-success';
+            }
+        }
+
+        // Simulate periodic sensor updates (in real system, this would be WebSocket or similar)
+        setInterval(() => {
+            if (autoUpdateEnabled) {
+                // Randomly update one parameter every few seconds
+                const parameters = ['u_q', 'u_d', 'i_d', 'i_q', 'motor_speed', 'coolant', 'ambient'];
+                const randomParam = parameters[Math.floor(Math.random() * parameters.length)];
+                refreshSensorData(randomParam);
+            }
+        }, 5000);
+
+        // Initialize timestamp
+        updateLastRefreshTime();
+    </script>
+</body>
+</html>

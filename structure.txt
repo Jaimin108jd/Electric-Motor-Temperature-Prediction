@@ -1,0 +1,24 @@
+Project Root: e:/EMPT2
+├── .venv/  (virtual environment directory)
+├── API_Documentation.md
+├── README.md
+├── app.py
+├── dataset22.csv
+├── empt.py
+├── feature_correlation_heatmap.png
+├── feature_distributions.png
+├── feature_scaler.pkl
+├── interactive_analysis.html
+├── interactive_analysis.png
+├── measures_v2.csv
+├── ml_model_comparison.png
+├── model_residuals_analysis.png
+├── motor_temperature_analysis.png
+├── motor_temperature_model.pkl
+├── requirements.txt
+└── templates/
+    ├── home.html
+    ├── manual_predict.html
+    ├── result.html
+    └── sensor_predict.html
+@jaimin108jd@gmail.com

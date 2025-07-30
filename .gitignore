@@ -1,0 +1,32 @@
+# Virtual Environment
+.venv/
+env/
+ENV/
+venv/
+*.env
+
+# Jupyter Notebook Checkpoints (if any are used)
+.ipynb_checkpoints/
+
+# VSCode
+.vscode/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Model and Scaler Files
+*.pkl
+
+# CSV and Dataset Files
+*.csv
+
+# Environment Files
+*.env
+
+# Compiled HTML Templates (if precompiled anywhere)
+*.pyc
+
+# Ignore compiled model
+motor_temperature_model.pkl
+feature_scaler.pkl
